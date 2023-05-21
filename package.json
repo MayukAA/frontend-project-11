@@ -1,5 +1,6 @@
 {
   "name": "@hexlet/code",
+  "type": "module",
   "version": "1.0.0",
   "description": "[![Actions Status](https://github.com/MayukAA/frontend-project-11/workflows/hexlet-check/badge.svg)](https://github.com/MayukAA/frontend-project-11/actions)",
   "main": "index.js",
@@ -23,6 +24,7 @@
     "eslint-plugin-import": "^2.27.5",
     "html-webpack-plugin": "^5.5.1",
     "webpack": "^5.83.1",
-    "webpack-cli": "^5.1.1"
+    "webpack-cli": "^5.1.1",
+    "webpack-dev-server": "^4.15.0"
   }
 }
