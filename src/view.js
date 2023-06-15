@@ -1,13 +1,11 @@
-const handleProcessState = (elements, processState, state) => {
+const handleProcessState = (elements, processState, state, i18nInstance) => {
   switch (processState) {
-    case 'filling':
-      break;
-
     case 'successful':
       elements.input.classList.remove('is-invalid');
       elements.feedback.classList.remove('text-danger');
       elements.feedback.classList.add('text-success');
-      elements.feedback.textContent = 'RSS успешно загружен'; // i18
+      // eslint-disable-next-line no-param-reassign
+      elements.feedback.textContent = i18nInstance.t('success');
       elements.form.reset();
       elements.input.focus();
       break;
@@ -16,7 +14,8 @@ const handleProcessState = (elements, processState, state) => {
       elements.input.classList.add('is-invalid');
       elements.feedback.classList.remove('text-success');
       elements.feedback.classList.add('text-danger');
-      elements.feedback.textContent = state.error.pop(); // MVC error
+      // eslint-disable-next-line no-param-reassign
+      elements.feedback.textContent = i18nInstance.t(state.error);
       break;
 
     default:
@@ -24,10 +23,10 @@ const handleProcessState = (elements, processState, state) => {
   }
 };
 
-export default (elements, initialState) => (path, value) => {
+export default (elements, initialState, i18nInstance) => (path, value) => {
   switch (path) {
     case 'processState':
-      handleProcessState(elements, value, initialState);
+      handleProcessState(elements, value, initialState, i18nInstance);
       break;
 
     default:
