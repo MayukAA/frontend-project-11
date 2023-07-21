@@ -84,19 +84,22 @@ const renderPosts = (elements, applyData, i18nInstance) => {
 
 const handleProcessState = (elements, processState, state, i18nInstance) => {
   switch (processState) {
-    case 'sending':
-      elements.input.setAttribute('readonly', 'true');
-      // eslint-disable-next-line no-param-reassign
-      elements.submitButton.disabled = true;
+    case 'filling':
+      elements.input.classList.remove('is-invalid');
       elements.feedback.classList.remove('text-danger');
       // eslint-disable-next-line no-param-reassign
       elements.feedback.textContent = '';
       break;
 
+    case 'sending':
+      elements.input.setAttribute('readonly', 'true');
+      // eslint-disable-next-line no-param-reassign
+      elements.submitButton.disabled = true;
+      break;
+
     case 'successful':
       elements.input.removeAttribute('readonly');
       elements.submitButton.removeAttribute('disabled');
-      elements.input.classList.remove('is-invalid');
       elements.feedback.classList.add('text-success');
       // eslint-disable-next-line no-param-reassign
       elements.feedback.textContent = i18nInstance.t('success');

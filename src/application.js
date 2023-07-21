@@ -128,6 +128,10 @@ export default () => {
     addNewPosts(state);
 
     // controller
+    elements.form.addEventListener('input', () => {
+      state.processState = 'filling';
+    });
+
     elements.form.addEventListener('submit', (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
@@ -152,15 +156,9 @@ export default () => {
           state.processState = 'successful';
         })
 
-        // .then(() => {
-        //   state.processState = 'successful';
-        //   state.feeds.push(url);
-        //   state.processState = 'filling';
-        // })
         .catch((err) => {
           state.error = err.message === 'Network Error' ? 'errors.network' : err.message;
           state.processState = 'failed';
-          state.processState = 'filling';
         });
     });
   });
