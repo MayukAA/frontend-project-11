@@ -10,6 +10,8 @@ import render from './view.js';
 import ru from './locales/ru.js';
 import parser from './parserRss.js';
 
+const timeout = 5000;
+
 yup.setLocale({
   mixed: {
     notOneOf: 'errors.oneOf',
@@ -21,21 +23,19 @@ yup.setLocale({
 
 const validate = (url, links) => {
   const schema = yup.string().required().url().notOneOf(links);
+
   return schema.validate(url);
 };
 
 const getHttpResponse = (link) => {
   const allOriginsBlank = 'https://allorigins.hexlet.app/get?disableCache=true&url=';
   const url = `${allOriginsBlank}${link}`;
+
   return axios.get(url);
 };
 
-const addId = (feedData, postsData) => {
-  const feed = { ...feedData };
+const addId = (postsData, feedId) => {
   const posts = [...postsData];
-
-  const feedId = _.uniqueId();
-  feed.id = feedId;
 
   posts.forEach((post) => {
     // eslint-disable-next-line no-param-reassign
@@ -44,7 +44,56 @@ const addId = (feedData, postsData) => {
     post.id = _.uniqueId();
   });
 
-  return { feed, posts };
+  return posts;
+};
+
+const addNewPosts = (state) => {
+  const promises = state.userLinks.map((link) => getHttpResponse(link));
+  const promise = Promise.all(promises);
+
+  return promise.then((response) => {
+    if (response) {
+      const [...responseData] = response;
+      const parsedData = responseData.map((linkData) => {
+        const { feedData, postsData } = parser(linkData.data.contents);
+        return { feedData, postsData };
+      });
+      // 'parsedData' - массив с объектами; сколько фидов, столько и объектов;
+      // массив: [{...}, {...}];
+      // объект: { feedData: '...', postsData: '...' };
+
+      parsedData.forEach((data) => {
+        // const { title, description } = data.feedData;
+        // так, потому что 'title' пересекается с 'title' в 'statePostsDataWithoutIds';
+        const httpTitle = data.feedData.title;
+        const httpDescription = data.feedData.description;
+
+        let feedId;
+        let requiredStatePostsData;
+
+        state.feedsData.forEach((feed) => {
+          if (feed.title === httpTitle && feed.description === httpDescription) {
+            feedId = feed.id;
+            requiredStatePostsData = state.postsData.filter((posts) => posts[0].feedId === feed.id)
+              .flat();
+          }
+        });
+
+        const requiredStateDataWithoutId = requiredStatePostsData.map((post) => {
+          const { title, desc, link } = post;
+          return { title, desc, link };
+        });
+
+        const newPosts = _.differenceWith(data.postsData, requiredStateDataWithoutId, _.isEqual);
+        if (newPosts.length > 0) {
+          const newPostsWithId = addId(newPosts, feedId);
+          state.postsData.push(newPostsWithId);
+        }
+      });
+    }
+
+    setTimeout(() => addNewPosts(state), timeout);
+  });
 };
 
 // model
@@ -76,6 +125,8 @@ export default () => {
 
     const state = onChange(initialState, render(elements, initialState, i18nInstance));
 
+    addNewPosts(state);
+
     // controller
     elements.form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -89,7 +140,12 @@ export default () => {
         })
         .then((response) => {
           const { feedData, postsData } = parser(response.data.contents);
-          const { feed, posts } = addId(feedData, postsData);
+
+          const feed = { ...feedData };
+          const feedId = _.uniqueId();
+          feed.id = feedId;
+          const posts = addId(postsData, feedId);
+
           state.feedsData.push(feed);
           state.postsData.push(posts);
           state.userLinks.push(url);
@@ -102,7 +158,6 @@ export default () => {
         //   state.processState = 'filling';
         // })
         .catch((err) => {
-          // state.error = err.message;
           state.error = err.message === 'Network Error' ? 'errors.network' : err.message;
           state.processState = 'failed';
           state.processState = 'filling';
