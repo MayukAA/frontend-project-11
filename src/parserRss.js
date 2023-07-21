@@ -1,6 +1,5 @@
 export default (data) => {
   const domParser = new DOMParser();
-  // const doc = domParser.parseFromString(data, 'application/xml');
   const doc = domParser.parseFromString(data, 'text/xml');
 
   const hasRss = doc.querySelector('rss');
