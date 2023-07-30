@@ -61,9 +61,9 @@ const renderPosts = (elements, applyData, i18nInstance) => {
     elLi.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
     const elA = document.createElement('a');
-    elA.classList.add('fw-bold');
     elA.setAttribute('href', arg.link);
-    // elA.setAttribute('data-id', '2');
+    elA.classList.add('fw-bold');
+    elA.setAttribute('data-id', arg.id);
     elA.setAttribute('target', '_blank');
     elA.setAttribute('rel', 'noopener noreferrer');
     elA.textContent = arg.title;
@@ -71,7 +71,7 @@ const renderPosts = (elements, applyData, i18nInstance) => {
     const elButton = document.createElement('button');
     elButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
     elButton.setAttribute('type', 'button');
-    // elButton.setAttribute('data-id', '2');
+    elButton.setAttribute('data-id', arg.id);
     elButton.setAttribute('data-bs-toggle', 'modal');
     elButton.setAttribute('data-bs-target', '#modal');
     elButton.textContent = i18nInstance.t('view');
@@ -80,6 +80,18 @@ const renderPosts = (elements, applyData, i18nInstance) => {
     elLi.append(elA);
     elLi.append(elButton);
   });
+};
+
+const handlePost = (elements, applyData) => {
+  const [postId] = applyData.args;
+  const selector = `[data-id="${postId}"]`;
+
+  const elPost = elements.containerPosts.querySelector(selector);
+
+  if (elPost) {
+    elPost.classList.remove('fw-bold');
+    elPost.classList.add('fw-normal', 'link-secondary');
+  }
 };
 
 const handleProcessState = (elements, processState, state, i18nInstance) => {
@@ -93,6 +105,7 @@ const handleProcessState = (elements, processState, state, i18nInstance) => {
 
     case 'sending':
       elements.input.setAttribute('readonly', 'true');
+      elements.feedback.classList.remove('text-danger');
       // eslint-disable-next-line no-param-reassign
       elements.submitButton.disabled = true;
       break;
@@ -134,6 +147,10 @@ export default (elements, initialState, i18nInstance) => (path, value, prevValue
 
     case 'postsData':
       renderPosts(elements, applyData, i18nInstance);
+      break;
+
+    case 'viewedPosts':
+      handlePost(elements, applyData);
       break;
 
     default:

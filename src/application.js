@@ -121,6 +121,7 @@ export default () => {
       feedsData: [],
       postsData: [],
       error: {},
+      viewedPosts: [],
     };
 
     const state = onChange(initialState, render(elements, initialState, i18nInstance));
@@ -160,6 +161,11 @@ export default () => {
           state.error = err.message === 'Network Error' ? 'errors.network' : err.message;
           state.processState = 'failed';
         });
+    });
+
+    elements.containerPosts.addEventListener('click', (e) => {
+      const postId = e.target.dataset.id;
+      state.viewedPosts.push(postId);
     });
   });
 };
