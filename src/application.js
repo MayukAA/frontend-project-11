@@ -64,8 +64,6 @@ const addNewPosts = (state) => {
       // объект: { feedData: '...', postsData: '...' };
 
       parsedData.forEach((data) => {
-        // const { title, description } = data.feedData;
-        // так, потому что 'title' пересекается с 'title' в 'statePostsDataWithoutIds';
         const httpTitle = data.feedData.title;
         const httpDescription = data.feedData.description;
 
@@ -75,7 +73,7 @@ const addNewPosts = (state) => {
         state.feedsData.forEach((feed) => {
           if (feed.title === httpTitle && feed.description === httpDescription) {
             feedId = feed.id;
-            requiredStatePostsData = state.postsData.filter((posts) => posts[0].feedId === feed.id)
+            requiredStatePostsData = state.postsData.filter((post) => post.feedId === feed.id)
               .flat();
           }
         });
@@ -88,7 +86,7 @@ const addNewPosts = (state) => {
         const newPosts = _.differenceWith(data.postsData, requiredStateDataWithoutId, _.isEqual);
         if (newPosts.length > 0) {
           const newPostsWithId = addId(newPosts, feedId);
-          state.postsData.push(newPostsWithId);
+          state.postsData.push(...newPostsWithId);
         }
       });
     }
@@ -154,7 +152,7 @@ export default () => {
           const posts = addId(postsData, feedId);
 
           state.feedsData.push(feed);
-          state.postsData.push(posts);
+          state.postsData.push(...posts);
           state.userLinks.push(url);
           state.processState = 'successful';
         })

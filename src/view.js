@@ -48,15 +48,13 @@ const renderFeeds = (elements, applyData, i18nInstance) => {
 };
 
 const renderPosts = (elements, applyData, i18nInstance) => {
-  const [applyDataArgs] = applyData.args;
-
-  if (applyData.result === 1) {
+  if (applyData.result === applyData.args.length) {
     renderContainer('posts', elements, i18nInstance);
   }
 
   const elUl = elements.containerPosts.querySelector('.list-group');
 
-  applyDataArgs.forEach((arg) => {
+  applyData.args.forEach((arg) => {
     const elLi = document.createElement('li');
     elLi.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
@@ -87,17 +85,15 @@ const handleModal = (elements, postId, state) => {
   const elModalBody = elements.containerModalContent.querySelector('.modal-body');
   const elModalFullArticle = elements.containerModalContent.querySelector('.full-article');
 
-  state.postsData.forEach((posts) => {
-    const [postContent] = posts.filter((post) => post.id === postId);
+  const [postContent] = state.postsData.filter((post) => post.id === postId);
 
-    if (postContent) {
-      const { title, desc, link } = postContent;
+  if (postContent) {
+    const { title, desc, link } = postContent;
 
-      elModalTitle.textContent = title;
-      elModalBody.textContent = desc;
-      elModalFullArticle.setAttribute('href', link);
-    }
-  });
+    elModalTitle.textContent = title;
+    elModalBody.textContent = desc;
+    elModalFullArticle.setAttribute('href', link);
+  }
 };
 
 const handlePost = (elements, applyData, state) => {
