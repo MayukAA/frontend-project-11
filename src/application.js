@@ -18,6 +18,7 @@ yup.setLocale({
   },
   string: {
     url: 'errors.valid',
+    required: 'errors.mustNotBeEmpty',
   },
 });
 
