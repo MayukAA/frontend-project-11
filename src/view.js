@@ -82,7 +82,25 @@ const renderPosts = (elements, applyData, i18nInstance) => {
   });
 };
 
-const handlePost = (elements, applyData) => {
+const handleModal = (elements, postId, state) => {
+  const elModalTitle = elements.containerModalContent.querySelector('.modal-title');
+  const elModalBody = elements.containerModalContent.querySelector('.modal-body');
+  const elModalFullArticle = elements.containerModalContent.querySelector('.full-article');
+
+  state.postsData.forEach((posts) => {
+    const [postContent] = posts.filter((post) => post.id === postId);
+
+    if (postContent) {
+      const { title, desc, link } = postContent;
+
+      elModalTitle.textContent = title;
+      elModalBody.textContent = desc;
+      elModalFullArticle.setAttribute('href', link);
+    }
+  });
+};
+
+const handlePost = (elements, applyData, state) => {
   const [postId] = applyData.args;
   const selector = `[data-id="${postId}"]`;
 
@@ -91,6 +109,8 @@ const handlePost = (elements, applyData) => {
   if (elPost) {
     elPost.classList.remove('fw-bold');
     elPost.classList.add('fw-normal', 'link-secondary');
+
+    handleModal(elements, postId, state);
   }
 };
 
@@ -150,7 +170,7 @@ export default (elements, initialState, i18nInstance) => (path, value, prevValue
       break;
 
     case 'viewedPosts':
-      handlePost(elements, applyData);
+      handlePost(elements, applyData, initialState);
       break;
 
     default:
