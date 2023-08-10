@@ -59,9 +59,6 @@ const addNewPosts = (state) => {
         const { feedData, postsData } = parser(linkData.data.contents);
         return { feedData, postsData };
       });
-      // 'parsedData' - массив с объектами; сколько фидов, столько и объектов;
-      // массив: [{...}, {...}];
-      // объект: { feedData: '...', postsData: '...' };
 
       parsedData.forEach((data) => {
         const httpTitle = data.feedData.title;
@@ -158,8 +155,13 @@ export default () => {
         })
 
         .catch((err) => {
-          state.error = err.message === 'Network Error' ? 'errors.network' : err.message;
-          state.processState = 'failed';
+          if (err.message === 'Network Error') {
+            state.error = 'errors.network';
+            state.processState = 'failedNetwork';
+          } else {
+            state.error = err.message;
+            state.processState = 'failed';
+          }
         });
     });
 

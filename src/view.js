@@ -123,6 +123,8 @@ const handleProcessState = (elements, processState, state, i18nInstance) => {
       elements.input.setAttribute('readonly', 'true');
       elements.feedback.classList.remove('text-danger');
       // eslint-disable-next-line no-param-reassign
+      elements.feedback.textContent = '';
+      // eslint-disable-next-line no-param-reassign
       elements.submitButton.disabled = true;
       break;
 
@@ -134,6 +136,15 @@ const handleProcessState = (elements, processState, state, i18nInstance) => {
       elements.feedback.textContent = i18nInstance.t('success');
       elements.form.reset();
       elements.input.focus();
+      break;
+
+    case 'failedNetwork':
+      elements.input.removeAttribute('readonly');
+      elements.submitButton.removeAttribute('disabled');
+      elements.feedback.classList.remove('text-success');
+      elements.feedback.classList.add('text-danger');
+      // eslint-disable-next-line no-param-reassign
+      elements.feedback.textContent = i18nInstance.t(state.error);
       break;
 
     case 'failed':
