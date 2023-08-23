@@ -110,6 +110,15 @@ const handlePost = (elements, applyData, state) => {
   }
 };
 
+const displayFailedProcessState = (elements, state, i18nInstance) => {
+  elements.input.removeAttribute('readonly');
+  elements.submitButton.removeAttribute('disabled');
+  elements.feedback.classList.remove('text-success');
+  elements.feedback.classList.add('text-danger');
+  // eslint-disable-next-line no-param-reassign
+  elements.feedback.textContent = i18nInstance.t(state.error);
+};
+
 const handleProcessState = (elements, processState, state, i18nInstance) => {
   switch (processState) {
     case 'filling':
@@ -139,22 +148,12 @@ const handleProcessState = (elements, processState, state, i18nInstance) => {
       break;
 
     case 'failedNetwork':
-      elements.input.removeAttribute('readonly');
-      elements.submitButton.removeAttribute('disabled');
-      elements.feedback.classList.remove('text-success');
-      elements.feedback.classList.add('text-danger');
-      // eslint-disable-next-line no-param-reassign
-      elements.feedback.textContent = i18nInstance.t(state.error);
+      displayFailedProcessState(elements, state, i18nInstance);
       break;
 
     case 'failed':
-      elements.input.removeAttribute('readonly');
-      elements.submitButton.removeAttribute('disabled');
       elements.input.classList.add('is-invalid');
-      elements.feedback.classList.remove('text-success');
-      elements.feedback.classList.add('text-danger');
-      // eslint-disable-next-line no-param-reassign
-      elements.feedback.textContent = i18nInstance.t(state.error);
+      displayFailedProcessState(elements, state, i18nInstance);
       break;
 
     default:
