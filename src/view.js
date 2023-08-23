@@ -155,7 +155,7 @@ const handleProcessState = (elements, processState, state, i18nInstance) => {
       break;
 
     default:
-      break;
+      throw new Error(`Unknown processState: '${processState}'!`);
   }
 };
 
@@ -178,6 +178,6 @@ export default (elements, initialState, i18nInstance) => (path, value, prevValue
       break;
 
     default:
-      break;
+      throw new Error(`Unknown path: '${path}'!`);
   }
 };
