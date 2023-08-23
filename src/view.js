@@ -178,6 +178,6 @@ export default (elements, initialState, i18nInstance) => (path, value, prevValue
       break;
 
     default:
-      throw new Error(`Unknown path: '${path}'!`);
+      break;
   }
 };
