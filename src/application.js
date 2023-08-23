@@ -8,7 +8,7 @@ import _ from 'lodash';
 
 import render from './view.js';
 import ru from './locales/ru.js';
-import parser from './parserRss.js';
+import parse from './parserRss.js';
 
 const timeout = 5000;
 
@@ -48,6 +48,19 @@ const addId = (postsData, feedId) => {
   return posts;
 };
 
+const getIdAndPostsFromState = (state, httpTitle, httpDescription) => {
+  const result = {};
+
+  state.feedsData.forEach((feed) => {
+    if (feed.title === httpTitle && feed.description === httpDescription) {
+      result.feedId = feed.id;
+      result.requiredPosts = state.postsData.filter((post) => post.feedId === feed.id).flat();
+    }
+  });
+
+  return result;
+};
+
 const addNewPosts = (state) => {
   const promises = state.userLinks.map((link) => getHttpResponse(link));
   const promise = Promise.all(promises);
@@ -56,7 +69,8 @@ const addNewPosts = (state) => {
     if (response) {
       const [...responseData] = response;
       const parsedData = responseData.map((linkData) => {
-        const { feedData, postsData } = parser(linkData.data.contents);
+        const { feedData, postsData } = parse(linkData.data.contents);
+
         return { feedData, postsData };
       });
 
@@ -64,23 +78,15 @@ const addNewPosts = (state) => {
         const httpTitle = data.feedData.title;
         const httpDescription = data.feedData.description;
 
-        let feedId;
-        let requiredStatePostsData;
+        const { feedId, requiredPosts } = getIdAndPostsFromState(state, httpTitle, httpDescription);
 
-        state.feedsData.forEach((feed) => {
-          if (feed.title === httpTitle && feed.description === httpDescription) {
-            feedId = feed.id;
-            requiredStatePostsData = state.postsData.filter((post) => post.feedId === feed.id)
-              .flat();
-          }
-        });
+        const postsWithoutIds = requiredPosts.map((post) => ({
+          title: post.title,
+          desc: post.desc,
+          link: post.link,
+        }));
 
-        const requiredStateDataWithoutId = requiredStatePostsData.map((post) => {
-          const { title, desc, link } = post;
-          return { title, desc, link };
-        });
-
-        const newPosts = _.differenceWith(data.postsData, requiredStateDataWithoutId, _.isEqual);
+        const newPosts = _.differenceWith(data.postsData, postsWithoutIds, _.isEqual);
         if (newPosts.length > 0) {
           const newPostsWithId = addId(newPosts, feedId);
           state.postsData.push(...newPostsWithId);
@@ -92,7 +98,6 @@ const addNewPosts = (state) => {
   });
 };
 
-// model
 export default () => {
   const i18nInstance = i18n.createInstance();
   i18nInstance.init({
@@ -125,7 +130,6 @@ export default () => {
 
     addNewPosts(state);
 
-    // controller
     elements.form.addEventListener('input', () => {
       state.processState = 'filling';
     });
@@ -138,10 +142,11 @@ export default () => {
       validate(url, state.userLinks)
         .then((link) => {
           state.processState = 'sending';
+
           return getHttpResponse(link);
         })
         .then((response) => {
-          const { feedData, postsData } = parser(response.data.contents);
+          const { feedData, postsData } = parse(response.data.contents);
 
           const feed = { ...feedData };
           const feedId = _.uniqueId();

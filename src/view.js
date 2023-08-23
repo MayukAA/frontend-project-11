@@ -88,11 +88,9 @@ const handleModal = (elements, postId, state) => {
   const [postContent] = state.postsData.filter((post) => post.id === postId);
 
   if (postContent) {
-    const { title, desc, link } = postContent;
-
-    elModalTitle.textContent = title;
-    elModalBody.textContent = desc;
-    elModalFullArticle.setAttribute('href', link);
+    elModalTitle.textContent = postContent.title;
+    elModalBody.textContent = postContent.desc;
+    elModalFullArticle.setAttribute('href', postContent.link);
   }
 };
 
