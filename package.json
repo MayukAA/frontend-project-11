@@ -2,7 +2,7 @@
   "name": "@hexlet/code",
   "type": "module",
   "version": "1.0.0",
-  "description": "[![Actions Status](https://github.com/MayukAA/frontend-project-11/workflows/hexlet-check/badge.svg)](https://github.com/MayukAA/frontend-project-11/actions)",
+  "description": "Rss Reader is a service for aggregating RSS feeds, with the help of which it is convenient to read a variety of sources, such as blogs",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
