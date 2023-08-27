@@ -64,13 +64,10 @@ const getIdAndPostsFromState = (state, httpTitle, httpDescription) => {
 
 const addNewPosts = (state, timeout) => {
   const promises = state.userLinks.map((link) => getHttpResponse(link));
-  const promise = Promise.all(promises);
-
-  return promise.then((response) => {
-    if (response) {
-      const [...responseData] = response;
-      const parsedData = responseData.map((linkData) => {
-        const { feedData, postsData } = parse(linkData.data.contents);
+  Promise.all(promises)
+    .then((responses) => {
+      const parsedData = responses.map((response) => {
+        const { feedData, postsData } = parse(response.data.contents);
 
         return { feedData, postsData };
       });
@@ -78,7 +75,6 @@ const addNewPosts = (state, timeout) => {
       parsedData.forEach((data) => {
         const httpTitle = data.feedData.title;
         const httpDescription = data.feedData.description;
-
         const { feedId, requiredPosts } = getIdAndPostsFromState(state, httpTitle, httpDescription);
 
         const postsWithoutIds = requiredPosts.map((post) => ({
@@ -93,10 +89,9 @@ const addNewPosts = (state, timeout) => {
           state.postsData.push(...newPostsWithId);
         }
       });
-    }
+    })
 
-    setTimeout(() => addNewPosts(state, timeout), timeout);
-  });
+    .finally(setTimeout(() => addNewPosts(state, timeout), timeout));
 };
 
 export default () => {
