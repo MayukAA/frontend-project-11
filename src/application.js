@@ -91,6 +91,10 @@ const addNewPosts = (state, timeout) => {
       });
     })
 
+    .catch((error) => {
+      console.error(error);
+    })
+
     .finally(setTimeout(() => addNewPosts(state, timeout), timeout));
 };
 
