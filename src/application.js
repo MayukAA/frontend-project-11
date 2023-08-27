@@ -10,18 +10,6 @@ import render from './view.js';
 import ru from './locales/ru.js';
 import parse from './parserRss.js';
 
-const timeout = 5000;
-
-yup.setLocale({
-  mixed: {
-    notOneOf: 'errors.oneOf',
-  },
-  string: {
-    url: 'errors.valid',
-    required: 'errors.mustNotBeEmpty',
-  },
-});
-
 const updateHtmlTitle = (element, i18nInstance) => {
   // eslint-disable-next-line no-param-reassign
   element.textContent = i18nInstance.t('title');
@@ -74,7 +62,7 @@ const getIdAndPostsFromState = (state, httpTitle, httpDescription) => {
   return result;
 };
 
-const addNewPosts = (state) => {
+const addNewPosts = (state, timeout) => {
   const promises = state.userLinks.map((link) => getHttpResponse(link));
   const promise = Promise.all(promises);
 
@@ -107,7 +95,7 @@ const addNewPosts = (state) => {
       });
     }
 
-    setTimeout(() => addNewPosts(state), timeout);
+    setTimeout(() => addNewPosts(state, timeout), timeout);
   });
 };
 
@@ -131,6 +119,18 @@ export default () => {
       containerModalContent: document.querySelector('.modal-content'),
     };
 
+    const timeout = 5000;
+
+    yup.setLocale({
+      mixed: {
+        notOneOf: 'errors.oneOf',
+      },
+      string: {
+        url: 'errors.valid',
+        required: 'errors.mustNotBeEmpty',
+      },
+    });
+
     const initialState = {
       processState: 'filling',
       userLinks: [],
@@ -144,7 +144,7 @@ export default () => {
 
     const state = onChange(initialState, render(elements, initialState, i18nInstance));
 
-    addNewPosts(state);
+    addNewPosts(state, timeout);
 
     elements.form.addEventListener('input', () => {
       state.processState = 'filling';
