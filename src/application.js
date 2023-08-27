@@ -33,9 +33,17 @@ const validate = (url, links) => {
   return schema.validate(url);
 };
 
+const getUrl = (link) => {
+  const allOriginsBlank = 'https://allorigins.hexlet.app/get';
+  const url = new URL(allOriginsBlank);
+  url.searchParams.set('disableCache', 'true');
+  url.searchParams.set('url', link);
+
+  return url;
+};
+
 const getHttpResponse = (link) => {
-  const allOriginsBlank = 'https://allorigins.hexlet.app/get?disableCache=true&url=';
-  const url = `${allOriginsBlank}${link}`;
+  const url = getUrl(link);
 
   return axios.get(url);
 };
