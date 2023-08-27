@@ -62,7 +62,7 @@ const getIdAndPostsFromState = (state, httpTitle, httpDescription) => {
   return result;
 };
 
-const addNewPosts = (state, timeout) => {
+const updatePosts = (state, timeout) => {
   const promises = state.userLinks.map((link) => getHttpResponse(link));
   Promise.all(promises)
     .then((responses) => {
@@ -95,7 +95,7 @@ const addNewPosts = (state, timeout) => {
       console.error(error);
     })
 
-    .finally(setTimeout(() => addNewPosts(state, timeout), timeout));
+    .finally(setTimeout(() => updatePosts(state, timeout), timeout));
 };
 
 export default () => {
@@ -143,7 +143,7 @@ export default () => {
 
     const state = onChange(initialState, render(elements, initialState, i18nInstance));
 
-    addNewPosts(state, timeout);
+    updatePosts(state, timeout);
 
     elements.form.addEventListener('input', () => {
       state.processState = 'filling';
