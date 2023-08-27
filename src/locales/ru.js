@@ -1,5 +1,6 @@
 export default {
   translation: {
+    title: 'MayukAA. RSS-Reader',
     success: 'RSS успешно загружен',
     feeds: 'Фиды',
     posts: 'Посты',

@@ -22,6 +22,11 @@ yup.setLocale({
   },
 });
 
+const updateHtmlTitle = (element, i18nInstance) => {
+  // eslint-disable-next-line no-param-reassign
+  element.textContent = i18nInstance.t('title');
+};
+
 const validate = (url, links) => {
   const schema = yup.string().required().url().notOneOf(links);
 
@@ -108,6 +113,7 @@ export default () => {
     },
   }).then(() => {
     const elements = {
+      title: document.querySelector('title'),
       form: document.querySelector('.rss-form'),
       input: document.getElementById('url-input'),
       submitButton: document.querySelector('[type="submit"]'),
@@ -125,6 +131,8 @@ export default () => {
       error: {},
       viewedPosts: [],
     };
+
+    updateHtmlTitle(elements.title, i18nInstance);
 
     const state = onChange(initialState, render(elements, initialState, i18nInstance));
 
